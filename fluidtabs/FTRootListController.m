@@ -55,6 +55,7 @@
 	[iphoneNavBar setShadowImage:nil];
 	[iphoneNavBar setTranslucent:YES];
 	[iphoneNavBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+	[iphoneNavBar setBackgroundColor:nil];
 	[self.navigationController.navigationController.view setBackgroundColor:[UIColor clearColor]];
 
 	[ipadNavBar setBarTintColor:nil];
