@@ -1,0 +1,9 @@
+Package: me.tomt000.fluidtabs
+Name: FluidTabs
+Depends: mobilesubstrate
+Version: 1.0.2
+Architecture: iphoneos-arm
+Description: Swipe between tabs.
+Maintainer: TomT000
+Author: TomT000
+Section: Tweaks
