@@ -11,8 +11,6 @@
 static NSString *options = @"/private/var/mobile/Library/Preferences/me.tomt000.fluidtabs.plist";
 
 static bool noAnimation = false;
-static bool loadedConfig = false;
-static bool enabledTweak = true;
 
 /**
   Makes a springboard fade-out animation used for respring in the settings apps
@@ -155,6 +153,9 @@ int getNextAvailableTab(UITabBarController *controller, BOOL isRight){
   TODO: Add more options in config?
 */
 %ctor {
+    bool loadedConfig = false;
+    bool enabledTweak = true;
+    
     if(!loadedConfig){
       NSMutableDictionary *prefs = [NSMutableDictionary new];
       if([[NSFileManager defaultManager] fileExistsAtPath:options]) prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:options];
