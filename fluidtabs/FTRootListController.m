@@ -11,57 +11,59 @@
 @implementation FTRootListController
 
 - (NSArray *)specifiers {
-	if (!_specifiers) {
+	if (!_specifiers)
 		_specifiers = [self loadSpecifiersFromPlistName:@"Root" target:self];
-	}
+
 	return _specifiers;
 }
 
 -(void)viewDidLoad {
 	[super viewDidLoad];
-
-	//Removes the white border
-	[_table setSeparatorColor:[UIColor clearColor]];
+	[_table setSeparatorColor:[UIColor clearColor]]; //Removes the separator white border
 }
 
 - (void)viewDidAppear:(BOOL)animated {
 	[super viewDidAppear:animated];
 
-	//Fixes Noctis / Eclipse design conflicts
-	//Very hacky lol
-	double delayInSeconds = 0.05;
-	dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-	dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+	/**
+		Fixes Noctis / Eclipse design conflicts
+		Very hacky lol
+	*/
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^(void){
 		UINavigationBar *bar = self.navigationController.navigationController.navigationBar;
 		if([bar _backgroundView]) [bar _backgroundView].backgroundColor = [UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0];
 
-		for(UIView *view in bar.subviews){
-			if([NSStringFromClass ([view class]) isEqualToString:@"_UIBarBackground"]){
-				NSLog(@"Removed eclipse design conflict");
-				view.backgroundColor = [UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0];
-				break;
-			}
+		for(UIView *view in bar.subviews)
+		if([NSStringFromClass ([view class]) isEqualToString:@"_UIBarBackground"]){
+			NSLog(@"Removed eclipse design conflict");
+			view.backgroundColor = [UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0];
+			break;
 		}
 	});
-
 }
 
 //Resets the navigation bar properies
 - (void)viewWillDisappear:(BOOL)arg{
 	[super viewWillDisappear:arg];
-	[self.navigationController.navigationController.navigationBar setBarTintColor:nil];
-	[self.navigationController.navigationController.navigationBar setTintColor:nil];
-	[self.navigationController.navigationController.navigationBar setTitleTextAttributes: @{NSForegroundColorAttributeName:[UIColor blackColor]}];
-	[self.navigationController.navigationController.navigationBar setShadowImage:nil];
-	[self.navigationController.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
 
-	[self.navigationController.navigationBar setBarTintColor:nil];
-	[self.navigationController.navigationBar setTitleTextAttributes: nil];
-	[self.navigationController.navigationBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
-	[self.navigationController.navigationBar setShadowImage:nil];
-	[self.navigationController.navigationBar setTranslucent:YES];
-	[self.navigationController.navigationBar setBackgroundColor:nil];
-	[self.navigationController.navigationBar setTintColor:nil];
+	UINavigationBar *iphoneNavBar = self.navigationController.navigationController.navigationBar;
+	UINavigationBar *ipadNavBar = self.navigationController.navigationBar;
+
+	[iphoneNavBar setBarTintColor:nil];
+	[iphoneNavBar setTintColor:nil];
+	[iphoneNavBar setTitleTextAttributes: @{NSForegroundColorAttributeName:[UIColor blackColor]}];
+	[iphoneNavBar setShadowImage:nil];
+	[iphoneNavBar setTranslucent:YES];
+	[iphoneNavBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+	[self.navigationController.navigationController.view setBackgroundColor:[UIColor clearColor]];
+
+	[ipadNavBar setBarTintColor:nil];
+	[ipadNavBar setTitleTextAttributes: nil];
+	[ipadNavBar setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+	[ipadNavBar setShadowImage:nil];
+	[ipadNavBar setTranslucent:YES];
+	[ipadNavBar setBackgroundColor:nil];
+	[ipadNavBar setTintColor:nil];
 	[self.navigationController.view setBackgroundColor:nil];
 
 	[[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleDefault];
@@ -103,22 +105,25 @@
 	[self.view setTintColor:[UIColor colorWithRed:0.28 green:0.16 blue:0.07 alpha:1.0]];
 	[UISwitch appearanceWhenContainedIn:self.class, nil].onTintColor = [UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0];
 
+	UINavigationBar *iphoneNavBar = self.navigationController.navigationController.navigationBar;
+	UINavigationBar *ipadNavBar = self.navigationController.navigationBar;
+
 	//iPhone
-	[self.navigationController.navigationController.navigationBar setTitleTextAttributes: @{NSForegroundColorAttributeName:[UIColor whiteColor]}];
-	[self.navigationController.navigationController.navigationBar setShadowImage:[UIImage new]];
-	[self.navigationController.navigationController.navigationBar setTranslucent:NO];
-	[self.navigationController.navigationController.navigationBar setBackgroundColor:[UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0]];
-	[self.navigationController.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
+	[iphoneNavBar setTitleTextAttributes: @{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+	[iphoneNavBar setShadowImage:[UIImage new]];
+	[iphoneNavBar setTranslucent:NO];
+	[iphoneNavBar setBackgroundColor:[UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0]];
+	[iphoneNavBar setTintColor:[UIColor whiteColor]];
 	[self.navigationController.navigationController.view setBackgroundColor:[UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0]];
 
 	//iPad
-	[self.navigationController.navigationBar setBarTintColor:[UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0]];
-	[self.navigationController.navigationBar setTitleTextAttributes: @{NSForegroundColorAttributeName:[UIColor whiteColor]}];
-	[self.navigationController.navigationBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
-	[self.navigationController.navigationBar setShadowImage:[UIImage new]];
-	[self.navigationController.navigationBar setTranslucent:NO];
-	[self.navigationController.navigationBar setBackgroundColor:[UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0]];
-	[self.navigationController.navigationBar setTintColor:[UIColor whiteColor]];
+	[ipadNavBar setBarTintColor:[UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0]];
+	[ipadNavBar setTitleTextAttributes: @{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+	[ipadNavBar setBackgroundImage:[UIImage new] forBarMetrics:UIBarMetricsDefault];
+	[ipadNavBar setShadowImage:[UIImage new]];
+	[ipadNavBar setTranslucent:NO];
+	[ipadNavBar setBackgroundColor:[UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0]];
+	[ipadNavBar setTintColor:[UIColor whiteColor]];
 	[self.navigationController.view setBackgroundColor:[UIColor colorWithRed:0.60 green:0.80 blue:0.32 alpha:1.0]];
 
 	[[UIApplication sharedApplication] setStatusBarStyle: UIStatusBarStyleLightContent];
@@ -198,8 +203,6 @@
 	 SBSRelaunchAction *restartAction = [objc_getClass("SBSRelaunchAction") actionWithReason:@"RestartRenderServer" options:SBSRelaunchActionOptionsFadeToBlackTransition targetURL:[NSURL URLWithString:@"prefs:root=FluidTabs"]];
 	 [[objc_getClass("FBSSystemService") sharedService] sendActions:[NSSet setWithObject:restartAction] withResult:nil];
 	});
-
-
 
 }
 
