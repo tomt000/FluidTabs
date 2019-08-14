@@ -44,6 +44,7 @@ bool shouldUseWhiteBackground(NSString *bundleID){
       @"fr.leboncoin.Leboncoin",
       @"net.whatsapp.WhatsApp",
       @"com.saurik.Cydia",
+      @"com.apple.music", //iOS 7
   nil];
 
   for(NSString *bundle in whiteApps)
@@ -60,11 +61,15 @@ bool shouldUseWhiteBackground(NSString *bundleID){
 int getNextAvailableTab(UITabBarController *controller, BOOL isRight){
   UITabBar *tabBar = controller.tabBar;
 
-  int goTo = isRight ? controller.selectedIndex - 1 : controller.selectedIndex + 1;
+  // Fix for the iTunes Store
+  // Somehow iTunes sets the tab index to the max long value when on the last tab, like wtf???
+  int selectedTab = fmax(0,fmin([tabBar.items count]-1,controller.selectedIndex));
 
-  if([tabBar.items count] <= controller.selectedIndex+1 && !isRight)
+  int goTo = isRight ? selectedTab - 1 : selectedTab + 1;
+
+  if([tabBar.items count] <= selectedTab+1 && !isRight)
     goTo = 0;
-  else if(controller.selectedIndex == 0 && isRight)
+  else if(selectedTab == 0 && isRight)
     goTo = [tabBar.items count]-1;
 
   return goTo;
@@ -77,9 +82,13 @@ int getNextAvailableTab(UITabBarController *controller, BOOL isRight){
 
   if(shouldUseWhiteBackground([[NSBundle mainBundle] bundleIdentifier])) self.view.backgroundColor = [UIColor whiteColor];
 
-  UISwipeGestureRecognizer *swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(nextView:)];
-  swipe.direction = UISwipeGestureRecognizerDirectionRight | UISwipeGestureRecognizerDirectionLeft;
-  [self.view addGestureRecognizer: swipe];
+  UISwipeGestureRecognizer *swipeRight = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(nextView:)];
+  swipeRight.direction = UISwipeGestureRecognizerDirectionRight;
+  [self.view addGestureRecognizer: swipeRight];
+
+  UISwipeGestureRecognizer *swipeLeft = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(nextView:)];
+  swipeLeft.direction = UISwipeGestureRecognizerDirectionLeft;
+  [self.view addGestureRecognizer: swipeLeft];
 
   self.view.userInteractionEnabled = YES;
 }
@@ -130,6 +139,8 @@ int getNextAvailableTab(UITabBarController *controller, BOOL isRight){
 
 %end
 
+%group SpringBoardHooks
+
 %hook SpringBoard
 
 /**
@@ -148,14 +159,17 @@ int getNextAvailableTab(UITabBarController *controller, BOOL isRight){
 
 %end
 
+%end
+
 /**
   Loads the config if not already loaded and checks if the injected process is an app
   TODO: Add more options in config?
 */
 %ctor {
+
     bool loadedConfig = false;
     bool enabledTweak = true;
-    
+
     if(!loadedConfig){
       NSMutableDictionary *prefs = [NSMutableDictionary new];
       if([[NSFileManager defaultManager] fileExistsAtPath:options]) prefs = [[NSMutableDictionary alloc] initWithContentsOfFile:options];
@@ -177,6 +191,8 @@ int getNextAvailableTab(UITabBarController *controller, BOOL isRight){
         return;
       else if([executablePath rangeOfString:@".app/"].location == NSNotFound && [executablePath rangeOfString:@"/Application/"].location == NSNotFound && [executablePath rangeOfString:@"/Applications/"].location == NSNotFound)
         return;
+      else if([executablePath rangeOfString:@"SpringBoard"].location != NSNotFound)
+        %init(SpringBoardHooks);
     }
 
    %init(_ungrouped);
